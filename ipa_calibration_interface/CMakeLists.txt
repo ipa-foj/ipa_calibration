@@ -79,6 +79,7 @@ include_directories(
 # calibration software
 add_executable(camera_laserscanner_calibration	ros/src/camera_laserscanner_calibration_node.cpp
 												ros/src/ipa_interface.cpp
+												ros/src/dekonbot_interface.cpp
 												ros/src/robotino_interface.cpp
 												ros/src/raw_interface.cpp
 												ros/src/cob_interface.cpp
