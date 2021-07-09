@@ -84,6 +84,7 @@ add_executable(camera_laserscanner_calibration	ros/src/camera_laserscanner_calib
 												ros/src/cob_interface.cpp
 												ros/src/calibration_type.cpp
 												ros/src/camera_laserscanner_type.cpp
+												ros/src/camera_laserscanner_differential_type.cpp
 												ros/src/calibration_marker.cpp
 												ros/src/checkerboard_marker.cpp
 												ros/src/pitag_marker.cpp
