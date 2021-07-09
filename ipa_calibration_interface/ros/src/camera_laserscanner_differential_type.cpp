@@ -395,6 +395,7 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 			geometry_msgs::Twist tw;
 			error_x = base_configuration.pose_x_ - T.at<double>(0,3);
 			error_y = base_configuration.pose_y_ - T.at<double>(1,3);
+			double error_position = std::sqrt(error_x*error_x + error_y*error_y);
 
 			cv::Vec3d ypr = transform_utilities::YPRFromRotationMatrix(T);
 			double robot_yaw = ypr.val[0];
@@ -403,7 +404,7 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 			double diff_x = base_configuration.pose_x_ - T.at<double>(0,3);
 			double diff_y = base_configuration.pose_y_ - T.at<double>(1,3);
 			error_phi = acos((robot_orientation_x*diff_x + robot_orientation_y*diff_y)/(std::sqrt(diff_x*diff_x + diff_y*diff_y)));
-			if ((fabs(error_x) < 0.01 && fabs(error_y) < 0.01) || !ros::ok())
+			if (fabs(error_position) < 0.01 || !ros::ok())
 				break;
 
 			if ( divergenceDetectedLocation(error_x, error_y, start_value) )
@@ -413,8 +414,7 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 			}
 			start_value = false;
 
-			tw.linear.x = std::max(-0.05, std::min(0.05, k_base*error_x));
-			tw.linear.y = std::max(-0.05, std::min(0.05, k_base*error_y));
+			tw.linear.x = std::max(-0.05, std::min(0.05, k_base*error_position));
 			if(error_phi>=0.02)
 				tw.angular.z = std::max(-0.05, std::min(0.05, k_phi*error_phi));
 			calibration_interface_->assignNewRobotVelocity(tw);

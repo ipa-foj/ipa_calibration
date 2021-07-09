@@ -66,7 +66,8 @@ enum RobotTypes
 {
     ROB_ROBOTINO	= 0,
     ROB_RAW_3_1		= 1,
-    ROB_COB			= 2
+	ROB_COB			= 2,
+	ROB_DEKONBOT	= 3
 };
 
 

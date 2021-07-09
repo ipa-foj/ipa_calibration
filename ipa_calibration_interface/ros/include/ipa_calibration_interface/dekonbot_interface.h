@@ -49,8 +49,7 @@
  *
  ****************************************************************/
 
-#ifndef RAW_CALIBRATION_H_
-#define RAW_CALIBRATION_H_
+#pragma once
 
 #include <ipa_calibration_interface/ipa_interface.h>
 #include <sensor_msgs/JointState.h>
@@ -103,6 +102,3 @@ public:
 	void assignNewArmJoints(const std::string &arm_name, std_msgs::Float64MultiArray new_arm_config);
 	std::vector<double>* getCurrentArmState(const std::string &arm_name);
 };
-
-
-#endif /* RAW_CALIBRATION_H_ */

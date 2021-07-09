@@ -99,6 +99,7 @@ add_dependencies(camera_laserscanner_calibration	${catkin_EXPORTED_TARGETS})
 
 add_executable(camera_arm_calibration	ros/src/camera_arm_calibration_node.cpp
 										ros/src/ipa_interface.cpp
+										ros/src/dekonbot_interface.cpp
 										ros/src/robotino_interface.cpp
 										ros/src/raw_interface.cpp
 										ros/src/cob_interface.cpp

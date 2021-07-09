@@ -82,6 +82,9 @@ DekonbotInterface::DekonbotInterface(ros::NodeHandle* nh, CalibrationType* calib
 
 	if ( arm_calibration_ )
 	{
+		ROS_ERROR("DekonbotInterface::DekonbotInterface - Arm Calibration not supported!");
+		return;
+
 		node_handle_.param<std::string>("arm_joint_controller_command", arm_joint_controller_command_, "");
 		std::cout << "arm_joint_controller_command: " << arm_joint_controller_command_ << std::endl;
 		arm_joint_controller_ = node_handle_.advertise<trajectory_msgs::JointTrajectory>(arm_joint_controller_command_, 1, false);
@@ -93,11 +96,6 @@ DekonbotInterface::DekonbotInterface(ros::NodeHandle* nh, CalibrationType* calib
 			std::cout << "arm_state_topic: " << arm_state_topic_ << std::endl;
 			arm_state_ = node_handle_.subscribe<sensor_msgs::JointState>(arm_state_topic_, 0, &DekonbotInterface::armStateCallback, this);
 			arm_action_client_.waitForServer();
-		}
-		else
-		{
-			ROS_ERROR("DekonbotInterface::DekonbotInterface - Could not create current arm state storage!");
-			return;
 		}
 	}
 	else
@@ -138,7 +136,8 @@ void DekonbotInterface::armStateCallback(const sensor_msgs::JointState::ConstPtr
 
 void DekonbotInterface::assignNewRobotVelocity(geometry_msgs::Twist new_velocity) // Spin and move velocities
 {
-	// Adjust here: Assign new robot velocity here
+	// In current DeKonBot setup, arm is placed 180 degrees rotated (along z axis), so change sign of linear velocity
+	new_velocity.linear.x *= -1.0;
 	base_controller_.publish(new_velocity);
 }
 
