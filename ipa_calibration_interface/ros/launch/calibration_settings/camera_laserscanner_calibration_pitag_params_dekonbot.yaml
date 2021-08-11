@@ -35,7 +35,7 @@ spedal_920pro_configs: [-1.639148235321045, -1.0135207933238526, 3.1206679344177
 base_configs: []
 
 # the robot base frame, needed for security measure (it's the reference frame to check the child_frame against before moving the robot)
-base_frame: "base_link"
+base_frame: "base_footprint"
 
 # The name of the reference frame. Has to match the entry found in the relative_localization yaml files.
 # string
