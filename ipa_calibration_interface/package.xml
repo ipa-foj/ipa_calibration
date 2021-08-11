@@ -18,6 +18,7 @@
 	<depend>cv_bridge</depend>
 	<depend>geometry_msgs</depend>
 	<depend>image_transport</depend>
+	<depend>ipa_manipulation_msgs</depend>
 	<depend>libcalibration</depend>
 	<depend>roscpp</depend>
 	<depend>roslib</depend>

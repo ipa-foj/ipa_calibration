@@ -50,29 +50,32 @@
  ****************************************************************/
 
 #include <ipa_calibration_interface/dekonbot_interface.h>
+#include <ipa_manipulation_msgs/JointsMovement.h>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
 #include <trajectory_msgs/JointTrajectory.h>
 
 
 DekonbotInterface::DekonbotInterface(ros::NodeHandle* nh, CalibrationType* calib_type, CalibrationMarker* calib_marker, bool do_arm_calibration, bool load_data) :
-				IPAInterface(nh, calib_type, calib_marker, do_arm_calibration, load_data), arm_state_current_(0), camera_state_current_(0),
-				arm_action_client_("/arm/joint_trajectory_controller/follow_joint_trajectory", true),
-				camera_action_client_("/torso/joint_trajectory_controller/follow_joint_trajectory", true)
+				IPAInterface(nh, calib_type, calib_marker, do_arm_calibration, load_data), arm_state_current_(0)
 {
 	std::cout << "\n========== DeKonbot Interface Parameters ==========\n";
 
 	// Adjust here: Add all needed code in here to let robot move itself, its camera and arm.
-	node_handle_.param<std::string>("camera_joint_controller_command", camera_joint_controller_command_, "");
-	std::cout << "camera_joint_controller_command: " << camera_joint_controller_command_ << std::endl;
-	camera_joint_controller_ = node_handle_.advertise<std_msgs::Float64MultiArray>(camera_joint_controller_command_, 1, false);
-
-	camera_state_current_ = new sensor_msgs::JointState;
-	if ( camera_state_current_ != 0 )
+	arm_state_current_ = new sensor_msgs::JointState;
+	if ( arm_state_current_ != 0 )
 	{
-		node_handle_.param<std::string>("camera_joint_state_topic", camera_joint_state_topic_, "");
-		std::cout << "camera_joint_state_topic: " << camera_joint_state_topic_ << std::endl;
-		camera_state_ = node_handle_.subscribe<sensor_msgs::JointState>(camera_joint_state_topic_, 0, &DekonbotInterface::cameraStateCallback, this);
-		camera_action_client_.waitForServer();
+		node_handle_.param<std::string>("arm_joint_state_topic", arm_joint_state_topic_, "");
+		std::cout << "arm_joint_state_topic: " << arm_joint_state_topic_ << std::endl;
+		arm_state_ = node_handle_.subscribe<sensor_msgs::JointState>(arm_joint_state_topic_, 0, &DekonbotInterface::armStateCallback, this);
+		node_handle_.param<std::string>("arm_joint_controller_command", arm_joint_control_topic_, "");
+		std::cout << "arm_joint_controller_command: " << arm_joint_control_topic_ << std::endl;
+		arm_movement_client_ = node_handle_.serviceClient<ipa_manipulation_msgs::JointsMovement>(arm_joint_control_topic_);
+		if (!arm_movement_client_.waitForExistence(ros::Duration(5.0)))
+		{
+			ROS_ERROR("DekonbotInterface::DekonbotInterface - arm control service server doesn't exist, please start 'ipa_arm_planning' node");
+			return;
+		}
+
 	}
 	else
 	{
@@ -84,19 +87,6 @@ DekonbotInterface::DekonbotInterface(ros::NodeHandle* nh, CalibrationType* calib
 	{
 		ROS_ERROR("DekonbotInterface::DekonbotInterface - Arm Calibration not supported!");
 		return;
-
-		node_handle_.param<std::string>("arm_joint_controller_command", arm_joint_controller_command_, "");
-		std::cout << "arm_joint_controller_command: " << arm_joint_controller_command_ << std::endl;
-		arm_joint_controller_ = node_handle_.advertise<trajectory_msgs::JointTrajectory>(arm_joint_controller_command_, 1, false);
-
-		arm_state_current_ = new sensor_msgs::JointState;
-		if ( arm_state_current_ != 0 )
-		{
-			node_handle_.param<std::string>("arm_state_topic", arm_state_topic_, "");
-			std::cout << "arm_state_topic: " << arm_state_topic_ << std::endl;
-			arm_state_ = node_handle_.subscribe<sensor_msgs::JointState>(arm_state_topic_, 0, &DekonbotInterface::armStateCallback, this);
-			arm_action_client_.waitForServer();
-		}
 	}
 	else
 	{
@@ -110,9 +100,6 @@ DekonbotInterface::DekonbotInterface(ros::NodeHandle* nh, CalibrationType* calib
 
 DekonbotInterface::~DekonbotInterface()
 {
-	if ( camera_state_current_ != 0 )
-		delete camera_state_current_;
-
 	if ( arm_state_current_ != 0 )
 		delete arm_state_current_;
 }
@@ -121,12 +108,6 @@ DekonbotInterface::~DekonbotInterface()
 // CAMERA CALIBRATION INTERFACE
 
 //Callbacks - User defined
-void DekonbotInterface::cameraStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
-{
-	boost::mutex::scoped_lock lock(camera_state_data_mutex_);
-	*camera_state_current_ = *msg;
-}
-
 void DekonbotInterface::armStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
 {
 	boost::mutex::scoped_lock lock(arm_state_data_mutex_);
@@ -143,37 +124,28 @@ void DekonbotInterface::assignNewRobotVelocity(geometry_msgs::Twist new_velocity
 
 void DekonbotInterface::assignNewCameraAngles(const std::string &camera_name, std_msgs::Float64MultiArray new_camera_angles)
 {
-	// Adjust here: Assign new camera tilt angle here
-	trajectory_msgs::JointTrajectoryPoint joint_traj_point;
-	trajectory_msgs::JointTrajectory joint_traj;
-	control_msgs::FollowJointTrajectoryGoal cam_goal;
-
-	if ( camera_name.compare("realsense_sr300") == 0 )
-		joint_traj.joint_names = {"arm_shoulder_pan_joint", "arm_shoulder_lift_joint", "arm_elbow_joint", "arm_wrist_1_joint", "arm_wrist_2_joint",
-									 "arm_wrist_3_joint"};
-	else if ( camera_name.compare("ids_ueye") )
-		joint_traj.joint_names = {"torso_bottom_joint", "torso_side_joint"};
+	// Assign new arm joint values
+	ipa_manipulation_msgs::JointsMovementRequest service_request;
+	if ( camera_name.compare("spedal_920pro")==0)
+		service_request.name = {"elbow_joint", "shoulder_lift_joint", "shoulder_pan_joint", "wrist_1_joint",
+										"wrist_2_joint", "wrist_3_joint"};
 	else
 	{
 		ROS_ERROR("DekonbotInterface::assignNewCameraAngles - Invalid camera name %s, cannot move anything!", camera_name.c_str());
 		return;
 	}
-
-	joint_traj_point.positions.insert(joint_traj_point.positions.end(), new_camera_angles.data.begin(), new_camera_angles.data.end());
-	joint_traj_point.time_from_start = ros::Duration(2);
-	joint_traj_point.velocities = {0,0}; //Initialize velocities to zero, does not work with empty list
-	joint_traj_point.accelerations = {0,0};
-	joint_traj.points.push_back(joint_traj_point);
-	joint_traj.header.stamp = ros::Time::now();
-
-	cam_goal.trajectory = joint_traj;
-	camera_action_client_.sendGoal(cam_goal);
+	service_request.values = new_camera_angles.data;
+	service_request.values_type = 0; // radians
+	service_request.movement_type = 0;
+	service_request.update_states = true;
+	ipa_manipulation_msgs::JointsMovementResponse service_response;
+	arm_movement_client_.call(service_request, service_response);
 }
 
 std::vector<double>* DekonbotInterface::getCurrentCameraState(const std::string &camera_name)
 {
-	boost::mutex::scoped_lock lock(camera_state_data_mutex_);
-	return &camera_state_current_->position;
+	boost::mutex::scoped_lock lock(arm_state_data_mutex_);
+	return &arm_state_current_->position;
 }
 // END CALIBRATION INTERFACE
 
@@ -182,20 +154,7 @@ std::vector<double>* DekonbotInterface::getCurrentCameraState(const std::string 
 void DekonbotInterface::assignNewArmJoints(const std::string &arm_name, std_msgs::Float64MultiArray new_arm_config)
 {
 	// Adjust here: Assign new joints to your robot arm
-	trajectory_msgs::JointTrajectoryPoint joint_traj_point;
-	trajectory_msgs::JointTrajectory joint_traj;
-	control_msgs::FollowJointTrajectoryGoal arm_goal;
-	joint_traj.joint_names = {"arm_shoulder_pan_joint", "arm_shoulder_lift_joint", "arm_elbow_joint", "arm_wrist_1_joint", "arm_wrist_2_joint",
-							 "arm_wrist_3_joint"};
-	joint_traj_point.positions.insert(joint_traj_point.positions.end(), new_arm_config.data.begin(), new_arm_config.data.end());
-	joint_traj_point.time_from_start = ros::Duration(2); // Quick and dirty, should actually be calculated by max angular speed and travel distance
-	joint_traj_point.velocities = {0,0,0,0,0,0};
-	joint_traj_point.accelerations = {0,0,0,0,0,0};
-	joint_traj.points.push_back(joint_traj_point);
-	joint_traj.header.stamp = ros::Time::now();
-	arm_goal.trajectory = joint_traj;
-
-	arm_action_client_.sendGoal(arm_goal);
+	ROS_ERROR("DekonbotInterface::DekonbotInterface - Arm Calibration not supported!");
 }
 
 std::vector<double>* DekonbotInterface::getCurrentArmState(const std::string &arm_name)
@@ -207,7 +166,7 @@ std::vector<double>* DekonbotInterface::getCurrentArmState(const std::string &ar
 
 std::string DekonbotInterface::getRobotName()
 {
-	return "RAW-3-1";
+	return "DeKonBot";
 }
 
 

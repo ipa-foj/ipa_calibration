@@ -55,7 +55,6 @@
 #include <sensor_msgs/JointState.h>
 #include <boost/thread/mutex.hpp>
 #include <actionlib/client/simple_action_client.h>
-#include <control_msgs/FollowJointTrajectoryAction.h>
 
 
 class DekonbotInterface : public IPAInterface
@@ -68,20 +67,14 @@ protected:
 	std::string base_controller_topic_name_;
 	ros::Publisher base_controller_;
 
-	sensor_msgs::JointState* camera_state_current_;
-	boost::mutex camera_state_data_mutex_;	// secures read operations on pan tilt joint state data
+	sensor_msgs::JointState* arm_state_current_;
+	boost::mutex arm_state_data_mutex_;	// secures read operations on pan tilt joint state data
 	std::string joint_state_topic_;
 
-	std::string camera_joint_state_topic_;
-	ros::Subscriber camera_state_;
-	actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> camera_action_client_;
-
-	std::string arm_state_topic_;
+	std::string arm_joint_state_topic_;
+	std::string arm_joint_control_topic_;
 	ros::Subscriber arm_state_;
-	sensor_msgs::JointState* arm_state_current_;
-	boost::mutex arm_state_data_mutex_;	// secures read operations on arm state data
-	actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> arm_action_client_;
-
+	ros::ServiceClient arm_movement_client_;
 
 public:
 	DekonbotInterface(ros::NodeHandle* nh, CalibrationType* calib_type, CalibrationMarker* calib_marker, bool do_arm_calibration, bool load_data);
@@ -95,7 +88,6 @@ public:
 	std::vector<double>* getCurrentCameraState(const std::string &camera_name);
 
 	// callbacks
-	void cameraStateCallback(const sensor_msgs::JointState::ConstPtr& msg);
 	void armStateCallback(const sensor_msgs::JointState::ConstPtr& msg);
 
 	// arm calibration interface

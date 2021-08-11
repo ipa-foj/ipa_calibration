@@ -24,6 +24,7 @@ set(catkin_RUN_PACKAGES			# all ROS packages from package.xml (libopencv-dev is 
 	cv_bridge
 	geometry_msgs
 	image_transport
+	ipa_manipulation_msgs
 	libcalibration
 	roscpp
 	roslib
