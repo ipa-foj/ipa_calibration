@@ -11,8 +11,8 @@ cameras_list: ["spedal_920pro", "6", "0"] #["ids_ueye", "2", "0"]
 # each parameter is set as [min_value, step, max_value]
 # vector<double>
 x_range: [-2.2, 0.2, -1.6]       # in [m]
-y_range: [1.0, 0.4, 1.4]         # in [m], fixed y-coordinate
-phi_range: [0, 1.0, 0]           # in [rad], fixed phi-angle
+y_range: [1.0, 1.0, 1.0]         # in [m], fixed y-coordinate
+phi_range: [-0.26, 0.26, 0.26]           # in [rad], fixed phi-angle
 #<camera2_name>_ranges: []  # further cameras possible
 
 # manually input of configurations for corresponding camera in camera_list
@@ -50,46 +50,25 @@ max_ref_frame_distance: 4.0
 # the uncertainties will be calibrated in the same order they appear in the uncertainties_list
 # last parent-branch frame and last child-branch frame have to be available from TF from the very beginning, so that the routine can build the kinematic chains
 # only transforms prior to last parent-branch frame and last child-branch frame can be used as uncertainties
-uncertainties_list: ["base_link", "arm_base_link", "landmark_reference_nav", "realsense_frame", "tag_25", "marker_25",
-                     "base_link", "arm_base_link", "landmark_reference_nav", "realsense_frame", "tag_36", "marker_36",
-                     "base_link", "arm_base_link", "landmark_reference_nav", "realsense_frame", "tag_38", "marker_38",
-                     "base_link", "arm_base_link", "landmark_reference_nav", "realsense_frame", "tag_48", "marker_48",
-                     "base_link", "arm_base_link", "landmark_reference_nav", "realsense_frame", "tag_55", "marker_55",
-                     "base_link", "arm_base_link", "landmark_reference_nav", "realsense_frame", "tag_64", "marker_64",
-                     "base_link", "arm_base_link", "landmark_reference_nav", "realsense_frame", "tag_69", "marker_69",
-                     "base_link", "arm_base_link", "landmark_reference_nav", "realsense_frame", "tag_73", "marker_73",
-                     "base_link", "arm_base_link", "landmark_reference_nav", "realsense_frame", "tag_79", "marker_79",
+uncertainties_list: ["base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_25", "marker_25",
+                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_36", "marker_36",
+                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_38", "marker_38",
+                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_48", "marker_48",
+                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_55", "marker_55",
+                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_64", "marker_64",
+                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_69", "marker_69",
+                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_73", "marker_73",
+                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_79", "marker_79",
 
-                     "gripper_frame", "realsense_link", "landmark_reference_nav", "realsense_frame", "tag_25", "marker_25",
-                     "gripper_frame", "realsense_link", "landmark_reference_nav", "realsense_frame", "tag_36", "marker_36",
-                     "gripper_frame", "realsense_link", "landmark_reference_nav", "realsense_frame", "tag_38", "marker_38",
-                     "gripper_frame", "realsense_link", "landmark_reference_nav", "realsense_frame", "tag_48", "marker_48",
-                     "gripper_frame", "realsense_link", "landmark_reference_nav", "realsense_frame", "tag_55", "marker_55",
-                     "gripper_frame", "realsense_link", "landmark_reference_nav", "realsense_frame", "tag_64", "marker_64",
-                     "gripper_frame", "realsense_link", "landmark_reference_nav", "realsense_frame", "tag_69", "marker_69",
-                     "gripper_frame", "realsense_link", "landmark_reference_nav", "realsense_frame", "tag_73", "marker_73",
-                     "gripper_frame", "realsense_link", "landmark_reference_nav", "realsense_frame", "tag_79", "marker_79"]
-
-#["base_link","torso_0_link", "landmark_reference_nav", "ids_ueye_frame", "tag_25", "marker_25",
-#                     "base_link","torso_0_link", "landmark_reference_nav", "ids_ueye_frame", "tag_36", "marker_36",
-#                     "base_link","torso_0_link", "landmark_reference_nav", "ids_ueye_frame", "tag_38", "marker_38",
-#                     "base_link","torso_0_link", "landmark_reference_nav", "ids_ueye_frame", "tag_48", "marker_48",
-#                     "base_link","torso_0_link", "landmark_reference_nav", "ids_ueye_frame", "tag_55", "marker_55",
-#                     "base_link","torso_0_link", "landmark_reference_nav", "ids_ueye_frame", "tag_64", "marker_64",
-#                     "base_link","torso_0_link", "landmark_reference_nav", "ids_ueye_frame", "tag_69", "marker_69",
-#                     "base_link","torso_0_link", "landmark_reference_nav", "ids_ueye_frame", "tag_73", "marker_73",
-#                     "base_link","torso_0_link", "landmark_reference_nav", "ids_ueye_frame", "tag_79", "marker_79",
-
-#                     "torso_tilt_link","ids_ueye_link", "landmark_reference_nav", "ids_ueye_frame", "tag_25", "marker_25",
-#                     "torso_tilt_link","ids_ueye_link", "landmark_reference_nav", "ids_ueye_frame", "tag_36", "marker_36",
-#                     "torso_tilt_link","ids_ueye_link", "landmark_reference_nav", "ids_ueye_frame", "tag_38", "marker_38",
-#                     "torso_tilt_link","ids_ueye_link", "landmark_reference_nav", "ids_ueye_frame", "tag_48", "marker_48",
-#                     "torso_tilt_link","ids_ueye_link", "landmark_reference_nav", "ids_ueye_frame", "tag_55", "marker_55",
-#                     "torso_tilt_link","ids_ueye_link", "landmark_reference_nav", "ids_ueye_frame", "tag_64", "marker_64",
-#                     "torso_tilt_link","ids_ueye_link", "landmark_reference_nav", "ids_ueye_frame", "tag_69", "marker_69",
-#                     "torso_tilt_link","ids_ueye_link", "landmark_reference_nav", "ids_ueye_frame", "tag_73", "marker_73",
-#                     "torso_tilt_link","ids_ueye_link", "landmark_reference_nav", "ids_ueye_frame", "tag_79", "marker_79"]
-
+                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_25", "marker_25",
+                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_36", "marker_36",
+                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_38", "marker_38",
+                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_48", "marker_48",
+                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_55", "marker_55",
+                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_64", "marker_64",
+                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_69", "marker_69",
+                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_73", "marker_73",
+                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_79", "marker_79"]
 
 # number of optimization iterations
 # int
