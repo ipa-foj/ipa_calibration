@@ -94,7 +94,7 @@ DekonbotInterface::DekonbotInterface(ros::NodeHandle* nh, CalibrationType* calib
 		std::cout << "base_controller_topic_name: " << base_controller_topic_name_ << std::endl;
 		base_controller_ = node_handle_.advertise<geometry_msgs::Twist>(base_controller_topic_name_, 1, false);
 	}
-
+	ros::Duration(2.0).sleep();
 	ROS_INFO("DekonbotInterface::DekonbotInterface - DekonbotInterface initialized.");
 }
 
@@ -127,17 +127,20 @@ void DekonbotInterface::assignNewCameraAngles(const std::string &camera_name, st
 	// Assign new arm joint values
 	ipa_manipulation_msgs::JointsMovementRequest service_request;
 	if ( camera_name.compare("spedal_920pro")==0)
-		service_request.name = {"elbow_joint", "shoulder_lift_joint", "shoulder_pan_joint", "wrist_1_joint",
-										"wrist_2_joint", "wrist_3_joint"};
+		service_request.name = {"shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
 	else
 	{
 		ROS_ERROR("DekonbotInterface::assignNewCameraAngles - Invalid camera name %s, cannot move anything!", camera_name.c_str());
 		return;
 	}
 	service_request.values = new_camera_angles.data;
+	// HACK: Change order of values, to match UR driver call
+	service_request.values[0] = new_camera_angles.data[2];
+	service_request.values[2] = new_camera_angles.data[0];
 	service_request.values_type = 0; // radians
 	service_request.movement_type = 0;
 	service_request.update_states = true;
+	std::cout << service_request << std::endl;
 	ipa_manipulation_msgs::JointsMovementResponse service_response;
 	arm_movement_client_.call(service_request, service_response);
 }

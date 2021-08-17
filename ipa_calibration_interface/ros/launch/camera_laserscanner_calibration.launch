@@ -6,6 +6,7 @@
 	<arg name="marker" default="pitag"/>		<!-- checkerboard or pitag -->
 	<arg name="robot" default="robotino"/>		<!-- robotino, cob, RAW or DeKonbot -->
 	<arg name="load_data" default="false"/>		<!-- whether data that has been stored previously will be loaded, for offline calibration -->
+	<arg name="differential" default="false"/>	<!-- whether the robot uses a differential base kinematic or not -->
 
 	<!-- Execute follwing group if data won't be loaded from disk -->
 	<group unless="$(arg load_data)">
@@ -28,6 +29,7 @@
 		<rosparam command="load" file="$(find ipa_calibration_interface)/ros/launch/calibration_settings/camera_laserscanner_calibration_$(arg marker)_params_$(arg robot).yaml"/>
 		<param name="marker_type" value="$(arg marker)" />
 		<param name="load_data" value="$(arg load_data)" />
+		<param name="differential" value="$(arg differential)" />
 	</node>
 
 </launch>

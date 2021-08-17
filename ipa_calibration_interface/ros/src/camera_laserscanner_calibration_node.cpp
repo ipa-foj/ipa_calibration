@@ -58,7 +58,7 @@
 #include <ipa_calibration_interface/checkerboard_marker.h>
 #include <ipa_calibration_interface/calibration_type.h>
 #include <ipa_calibration_interface/camera_laserscanner_type.h>
-
+#include <ipa_calibration_interface/camera_laserscanner_differential_type.h>
 
 //#######################
 //#### main programm ####
@@ -81,11 +81,18 @@ int main(int argc, char** argv)
 	int calibration_ID = 0;
 	nh.param("calibration_ID", calibration_ID, 0);
 	std::cout << "calibration_ID: " << calibration_ID << std::endl;
+	bool differential_type = false;
+	nh.param("differential", differential_type, false);
+	std::cout << "differential: " << differential_type << std::endl;
 
 	bool arm_calibration = false;
 
 	// setting up objects needed for calibration
-	CalibrationType* calibration_type = new CameraLaserscannerType();
+	CalibrationType* calibration_type;
+	if(!differential_type)
+		calibration_type = new CameraLaserscannerType();
+	else
+		calibration_type = new CameraLaserscannerDifferentialType();
 	CalibrationMarker* marker = 0;
 	CalibrationInterface* interface = 0;
 

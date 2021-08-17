@@ -311,7 +311,7 @@ bool CameraLaserscannerDifferentialType::moveCameras(int config_index)
 unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definition::RobotConfiguration &base_configuration)
 {
 	const double k_base = 0.25;
-	const double k_phi = 0.25;
+	const double k_phi = 2.0;
 
 	double error_phi = 0;
 	double error_x = 0;
@@ -375,7 +375,8 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 			}
 			start_value = false;
 
-			tw.angular.z = std::max(-0.05, std::min(0.05, k_phi*error_phi));
+			tw.angular.z = std::max(-0.2, std::min(0.2, k_phi*error_phi));
+			std::cout << "error phi:" << error_phi << std::endl;
 			calibration_interface_->assignNewRobotVelocity(tw);
 			ros::Rate(20).sleep();
 		}
@@ -416,7 +417,7 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 
 			tw.linear.x = std::max(-0.05, std::min(0.05, k_base*error_position));
 			if(error_phi>=0.02)
-				tw.angular.z = std::max(-0.05, std::min(0.05, k_phi*error_phi));
+				tw.angular.z = std::max(-0.2, std::min(0.2, k_phi*error_phi));
 			calibration_interface_->assignNewRobotVelocity(tw);
 			ros::Rate(20).sleep();
 		}
@@ -453,7 +454,7 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 			}
 			start_value = false;
 
-			tw.angular.z = std::max(-0.05, std::min(0.05, k_phi*error_phi));
+			tw.angular.z = std::max(-0.2, std::min(0.2, k_phi*error_phi));
 			calibration_interface_->assignNewRobotVelocity(tw);
 			ros::Rate(20).sleep();
 		}
