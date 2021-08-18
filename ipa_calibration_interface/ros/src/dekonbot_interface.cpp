@@ -141,7 +141,6 @@ void DekonbotInterface::assignNewCameraAngles(const std::string &camera_name, st
 	service_request.values_type = 0; // radians
 	service_request.movement_type = 0;
 	service_request.update_states = false;
-	std::cout << service_request << std::endl;
 	ipa_manipulation_msgs::JointsMovementResponse service_response;
 	arm_movement_client_.call(service_request, service_response);
 }

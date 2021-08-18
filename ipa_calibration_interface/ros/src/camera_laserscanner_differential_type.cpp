@@ -310,7 +310,7 @@ bool CameraLaserscannerDifferentialType::moveCameras(int config_index)
 
 unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definition::RobotConfiguration &base_configuration)
 {
-	const double k_base = 0.25;
+	const double k_base = 2.0;
 	const double k_phi = 2.0;
 
 	double error_phi = 0;
@@ -325,6 +325,8 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 		turnOffBaseMotion();
 		return error_code;
 	}
+	
+	std::cout << "Move to: [" << base_configuration.pose_x_ << ", " << base_configuration.pose_y_ << ", " << base_configuration.pose_phi_ << "]" << std::endl;
 
 	cv::Vec3d ypr = transform_utilities::YPRFromRotationMatrix(T);
 	double robot_yaw = ypr.val[0];
@@ -337,13 +339,15 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 	error_x = base_configuration.pose_x_ - T.at<double>(0,3);
 	error_y = base_configuration.pose_y_ - T.at<double>(1,3);
 
+	std::cout << "Errors: [" << error_x << ", " << error_y << ", " << error_phi << "]" << std::endl;
+
 	// Do a "bang-bang-control" -> rotate towards new configuration, move towards configuration, rotate to desired angle
 	// do not move if close to goal
 	bool start_value = true; // for divergence detection
-	if ( fabs(error_phi) > 0.02 || fabs(error_x) > 0.01 || fabs(error_y) > 0.01 )
+	if ( fabs(error_phi) > 0.05 || fabs(error_x) > 0.02 || fabs(error_y) > 0.02 )
 	{
-		// turn robot towards goal
-		while(true)
+		// turn robot towards goal (if not already on goal)
+		while(true && (fabs(error_x) > 0.02 || fabs(error_y) > 0.02))
 		{
 			if (!isReferenceFrameValid(T, error_code))
 			{
@@ -382,7 +386,6 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 			start_value = false;
 
 			tw.angular.z = std::max(-0.2, std::min(0.2, k_phi*error_phi));
-			std::cout << "error phi:" << error_phi << std::endl;
 			calibration_interface_->assignNewRobotVelocity(tw);
 			ros::Rate(20).sleep();
 		}
@@ -391,7 +394,7 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 
 		// control position (while maintaining orientation towards goal)
 		start_value = true;
-		while(true)
+		while(true && (fabs(error_x) > 0.02 || fabs(error_y) > 0.02))
 		{
 			if (!isReferenceFrameValid(T, error_code))
 			{
@@ -472,7 +475,7 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 			}
 			start_value = false;
 
-			tw.angular.z = std::max(-0.2, std::min(0.2, k_phi*error_phi));
+			tw.angular.z = std::max(-0.1, std::min(0.1, k_phi*error_phi));
 			calibration_interface_->assignNewRobotVelocity(tw);
 			ros::Rate(20).sleep();
 		}
