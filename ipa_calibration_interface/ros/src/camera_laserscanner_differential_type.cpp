@@ -351,6 +351,8 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 				return error_code;
 			}
 
+			// get the angle between the current orientation of the robot and the vector pointing towards the
+			// goal base pose
 			cv::Vec3d ypr = transform_utilities::YPRFromRotationMatrix(T);
 			double robot_yaw = ypr.val[0];
 			double robot_orientation_x = std::cos(robot_yaw);
@@ -358,15 +360,19 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 			double diff_x = base_configuration.pose_x_ - T.at<double>(0,3);
 			double diff_y = base_configuration.pose_y_ - T.at<double>(1,3);
 			geometry_msgs::Twist tw;
-			error_phi = acos((robot_orientation_x*diff_x + robot_orientation_y*diff_y)/(std::sqrt(diff_x*diff_x + diff_y*diff_y)));
+			error_phi = acos((robot_orientation_x*diff_x + robot_orientation_y*diff_y)/(std::sqrt(diff_x*diff_x + diff_y*diff_y))); // norm of orientation vector = 1 always
 
-			while (error_phi < -CV_PI*0.5)
-				error_phi += CV_PI;
 			while (error_phi > CV_PI*0.5)
 				error_phi -= CV_PI;
 
 			if (fabs(error_phi) < 0.02 || !ros::ok())
 				break;
+
+			// get the sign of the angle-difference (using the cross-product, the dot-product doesn't preserve
+			// the direction of the rotation)
+			double cross_product = robot_orientation_x*diff_y - robot_orientation_y*diff_x;
+			if(cross_product<0.0)
+				error_phi *= -1.0;
 
 			if ( divergenceDetectedRotation(error_phi, start_value) )
 			{
@@ -398,6 +404,11 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 			error_y = base_configuration.pose_y_ - T.at<double>(1,3);
 			double error_position = std::sqrt(error_x*error_x + error_y*error_y);
 
+			if (fabs(error_position) < 0.01 || !ros::ok())
+				break;
+
+			// get the angle between the current orientation of the robot and the vector pointing towards the
+			// goal base pose
 			cv::Vec3d ypr = transform_utilities::YPRFromRotationMatrix(T);
 			double robot_yaw = ypr.val[0];
 			double robot_orientation_x = std::cos(robot_yaw);
@@ -405,8 +416,15 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 			double diff_x = base_configuration.pose_x_ - T.at<double>(0,3);
 			double diff_y = base_configuration.pose_y_ - T.at<double>(1,3);
 			error_phi = acos((robot_orientation_x*diff_x + robot_orientation_y*diff_y)/(std::sqrt(diff_x*diff_x + diff_y*diff_y)));
-			if (fabs(error_position) < 0.01 || !ros::ok())
-				break;
+
+			while (error_phi > CV_PI*0.5)
+				error_phi -= CV_PI;
+
+			// get the sign of the angle-difference (using the cross-product, the dot-product doesn't preserve
+			// the direction of the rotation)
+			double cross_product = robot_orientation_x*diff_y - robot_orientation_y*diff_x;
+			if(cross_product<0.0)
+				error_phi *= -1.0;
 
 			if ( divergenceDetectedLocation(error_x, error_y, start_value) )
 			{
@@ -417,7 +435,7 @@ unsigned short CameraLaserscannerDifferentialType::moveBase(const pose_definitio
 
 			tw.linear.x = std::max(-0.05, std::min(0.05, k_base*error_position));
 			if(error_phi>=0.02)
-				tw.angular.z = std::max(-0.2, std::min(0.2, k_phi*error_phi));
+				tw.angular.z = std::max(-0.1, std::min(0.1, k_phi*error_phi));
 			calibration_interface_->assignNewRobotVelocity(tw);
 			ros::Rate(20).sleep();
 		}
