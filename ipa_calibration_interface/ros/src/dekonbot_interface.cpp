@@ -117,8 +117,9 @@ void DekonbotInterface::armStateCallback(const sensor_msgs::JointState::ConstPtr
 
 void DekonbotInterface::assignNewRobotVelocity(geometry_msgs::Twist new_velocity) // Spin and move velocities
 {
-	// In current DeKonBot setup, arm is placed 180 degrees rotated (along z axis), so change sign of linear velocity
+	// In current DeKonBot setup, arm is placed 180 degrees rotated (along z axis), so change sign of velocity
 	new_velocity.linear.x *= -1.0;
+	//new_velocity.angular.z *= -1.0;
 	base_controller_.publish(new_velocity);
 }
 
@@ -139,7 +140,7 @@ void DekonbotInterface::assignNewCameraAngles(const std::string &camera_name, st
 	service_request.values[2] = new_camera_angles.data[0];
 	service_request.values_type = 0; // radians
 	service_request.movement_type = 0;
-	service_request.update_states = true;
+	service_request.update_states = false;
 	std::cout << service_request << std::endl;
 	ipa_manipulation_msgs::JointsMovementResponse service_response;
 	arm_movement_client_.call(service_request, service_response);
