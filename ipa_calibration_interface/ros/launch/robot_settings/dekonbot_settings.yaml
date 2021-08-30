@@ -13,7 +13,8 @@ base_controller_topic_name: "/cmd_vel"
 
 # Image topic
 # string
-camera_image_topic: "/image_raw"  # change to topic rect
+#camera_image_topic: "/image_raw"  # change to topic rect
+camera_image_topic: "/cam_publisher/image"
 
 # calibration interface ID. Decides which robot's interface to use: 0 - Robotino, 1 - RAW, 2 - COB, 3 - DeKonBot
 # int

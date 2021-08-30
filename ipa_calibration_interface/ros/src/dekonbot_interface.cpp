@@ -54,6 +54,9 @@
 #include <trajectory_msgs/JointTrajectoryPoint.h>
 #include <trajectory_msgs/JointTrajectory.h>
 
+#include <chrono>
+#include <thread>
+
 
 DekonbotInterface::DekonbotInterface(ros::NodeHandle* nh, CalibrationType* calib_type, CalibrationMarker* calib_marker, bool do_arm_calibration, bool load_data) :
 				IPAInterface(nh, calib_type, calib_marker, do_arm_calibration, load_data), arm_state_current_(0)
@@ -127,7 +130,7 @@ void DekonbotInterface::assignNewCameraAngles(const std::string &camera_name, st
 {
 	// Assign new arm joint values
 	ipa_manipulation_msgs::JointsMovementRequest service_request;
-	if ( camera_name.compare("spedal_920pro")==0)
+	if ( camera_name.compare("spedal_920pro")==0 || camera_name.compare("ipa_3d_sensor")==0)
 		service_request.name = {"shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
 	else
 	{
@@ -143,6 +146,7 @@ void DekonbotInterface::assignNewCameraAngles(const std::string &camera_name, st
 	service_request.update_states = false;
 	ipa_manipulation_msgs::JointsMovementResponse service_response;
 	arm_movement_client_.call(service_request, service_response);
+	std::this_thread::sleep_for(std::chrono::seconds(3)); // sleep s.t. arm can stabilize and isn't shaking anymore
 }
 
 std::vector<double>* DekonbotInterface::getCurrentCameraState(const std::string &camera_name)

@@ -5,14 +5,14 @@
 # cameraX_name can be any name to distinguish different cameras inside the interface
 # max_delta_angle is a security measure to avoid movement when target angles and current angles of a camera are not too far away from one another.
 # This can lead to collision issues for some cameras (e.g. when attached to an arm). Setting it to 0 turns it off (only recommended for pan/tilt cameras)
-cameras_list: ["spedal_920pro", "6", "0"] #["ids_ueye", "2", "0"]
+cameras_list: ["ipa_3d_sensor", "6", "0"] #["ipa_3d_sensor", "6", "0"]
 
 # ranges for the degrees of freedom of the robot
 # each parameter is set as [min_value, step, max_value]
 # vector<double>
 x_range: [-2.2, 0.2, -1.6]       # in [m]
 y_range: [1.0, 1.0, 1.0]         # in [m], fixed y-coordinate
-phi_range: [-0.15, 0.15, 0.15]           # in [rad], fixed phi-angle
+phi_range: [-0.1, 0.1, 0.1]           # in [rad], fixed phi-angle
 #<camera2_name>_ranges: []  # further cameras possible
 
 # manually input of configurations for corresponding camera in camera_list
@@ -23,13 +23,26 @@ phi_range: [-0.15, 0.15, 0.15]           # in [rad], fixed phi-angle
 # further cameras possible
 #<camera2_name>_configs: []
 
-spedal_920pro_configs: [-2.084791660308838, -0.7674998801997681, 3.1550159454345703, -0.2896474164775391, 0.0025789737701416016, 3.121094226837158,
--1.072460651397705, -0.9810930055430909, 3.154967784881592, -1.0958445829204102, 0.0024352073669433594, 3.121094226837158,
--1.860755443572998, -0.1487153333476563, 3.154967784881592, -1.0921247762492676, 0.0026509761810302734, 3.1210460662841797,
--1.3320488929748535, -1.3033313316157837, 3.154390335083008, -0.46659548700366216, 0.019518136978149414, 3.121070384979248,
--1.3191466331481934, -1.3037858766368409, 2.465928554534912, -0.46720726907763677, 0.7223358154296875, 3.121070384979248,
--1.4478802680969238, -1.2748633188060303, 3.701507568359375, -0.4690912526896973, -0.3650921026812952, 3.1211180686950684,
--2.2902731895446777, -0.5918961328319092, 3.100536346435547, -0.21742184579882817, 0.012210607528686523, 3.121094226837158]
+# TODO: switch, based on which camera will be calibrated
+#spedal_920pro_configs: [-2.084791660308838, -0.7674998801997681, 3.1550159454345703, -0.2896474164775391, 0.0025789737701416016, 3.121094226837158,
+#-1.072460651397705, -0.9810930055430909, 3.154967784881592, -1.0958445829204102, 0.0024352073669433594, 3.121094226837158,
+#-1.860755443572998, -0.1487153333476563, 3.154967784881592, -1.0921247762492676, 0.0026509761810302734, 3.1210460662841797,
+#-1.3320488929748535, -1.3033313316157837, 3.154390335083008, -0.46659548700366216, 0.019518136978149414, 3.121070384979248,
+#-1.3191466331481934, -1.3037858766368409, 2.465928554534912, -0.46720726907763677, 0.7223358154296875, 3.121070384979248,
+#-1.4478802680969238, -1.2748633188060303, 3.701507568359375, -0.4690912526896973, -0.3650921026812952, 3.1211180686950684,
+#-2.2902731895446777, -0.5918961328319092, 3.100536346435547, -0.21742184579882817, 0.012210607528686523, 3.121094226837158]
+
+ipa_3d_sensor_configs: [-2.084791660308838, -0.7674998801997681, 3.1550159454345703, -0.2896474164775391, 0.0025789737701416016, 3.121094226837158,
+-2.2932963371276855, -0.5849762719920655, 3.100536346435547, -0.21805603921923833, -0.4877708593951624, 3.1209864616394043,
+-2.293356418609619, -0.5850721162608643, 3.100644111633301, -0.21941979349169927, 0.3267941474914551, 3.120974540710449,
+-1.3661112785339355, -1.4224048417857666, 3.1002488136291504, -0.3619421285441895, 0.16171813011169434, 3.1208786964416504,
+-1.3660035133361816, -1.4223329585841675, 3.100452423095703, -0.36150916040454106, -0.2595589796649378, 3.120926856994629,
+-1.3701305389404297, -1.4098484081080933, 3.100452423095703, -0.2770732206157227, -0.7001932303058069, 3.1208786964416504,
+-2.6074414253234863, -0.1104780000499268, 3.163998603820801, -0.3637688916972657, -0.5937870184527796, 3.120938777923584,
+-2.607405185699463, -0.1105378431132813, 3.163938522338867, -0.36400921762500005, -0.1815112272845667, 3.120974540710449,
+-2.6074414253234863, -0.11057384431872563, 3.163998603820801, -0.36451371133837895, 0.253298282623291, 3.1208786964416504,
+-1.3096709251403809, -1.266315059070923, 3.1637582778930664, -0.5855329793742676, -0.5015996138202112, 3.1208786964416504,
+-2.162550449371338, -0.5130143922618409, 3.1637582778930664, -0.4385994237712403, -0.11107379594911748, 3.1208910942077637]
 
 # list of robot's base configurations used in calibration for observing the pitags measured relative to the landmark_reference_nav coordinate system that is similarly aligned as the robot's base_link
 # each base configuration will go through every camera's configuration
@@ -52,25 +65,28 @@ max_ref_frame_distance: 4.0
 # the uncertainties will be calibrated in the same order they appear in the uncertainties_list
 # last parent-branch frame and last child-branch frame have to be available from TF from the very beginning, so that the routine can build the kinematic chains
 # only transforms prior to last parent-branch frame and last child-branch frame can be used as uncertainties
-uncertainties_list: ["base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_25", "marker_25",
-                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_36", "marker_36",
-                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_38", "marker_38",
-                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_48", "marker_48",
-                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_55", "marker_55",
-                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_64", "marker_64",
-                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_69", "marker_69",
-                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_73", "marker_73",
-                     "base_footprint", "base_link", "landmark_reference_nav", "usb_cam_link", "tag_79", "marker_79",
+# First: C920 links, Second: 3D sensor links
+uncertainties_list: [
+                     #"wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_25", "marker_25",
+                     #"wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_36", "marker_36",
+                     #"wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_38", "marker_38",
+                     #"wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_48", "marker_48",
+                     #"wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_55", "marker_55",
+                     #"wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_64", "marker_64",
+                     #"wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_69", "marker_69",
+                     #"wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_73", "marker_73",
+                     #"wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_79", "marker_79",
 
-                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_25", "marker_25",
-                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_36", "marker_36",
-                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_38", "marker_38",
-                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_48", "marker_48",
-                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_55", "marker_55",
-                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_64", "marker_64",
-                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_69", "marker_69",
-                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_73", "marker_73",
-                     "wrist_2_link", "usb_cam_link", "landmark_reference_nav", "usb_cam_link", "tag_79", "marker_79"]
+                     "wrist_2_link", "3d_cam_link", "landmark_reference_nav", "3d_cam_link", "tag_25", "marker_25",
+                     "wrist_2_link", "3d_cam_link", "landmark_reference_nav", "3d_cam_link", "tag_36", "marker_36",
+                     "wrist_2_link", "3d_cam_link", "landmark_reference_nav", "3d_cam_link", "tag_38", "marker_38",
+                     "wrist_2_link", "3d_cam_link", "landmark_reference_nav", "3d_cam_link", "tag_48", "marker_48",
+                     "wrist_2_link", "3d_cam_link", "landmark_reference_nav", "3d_cam_link", "tag_55", "marker_55",
+                     "wrist_2_link", "3d_cam_link", "landmark_reference_nav", "3d_cam_link", "tag_64", "marker_64",
+                     "wrist_2_link", "3d_cam_link", "landmark_reference_nav", "3d_cam_link", "tag_69", "marker_69",
+                     "wrist_2_link", "3d_cam_link", "landmark_reference_nav", "3d_cam_link", "tag_73", "marker_73",
+                     "wrist_2_link", "3d_cam_link", "landmark_reference_nav", "3d_cam_link", "tag_79", "marker_79"
+                     ]
 
 # number of optimization iterations
 # int
@@ -82,4 +98,5 @@ transform_discard_timeout: 3.0
 
 # storage folder that holds the calibration output
 # string
-calibration_storage_path: "dekonbot_calibration/c920_pitag_calibration"
+#calibration_storage_path: "dekonbot_calibration/c920_pitag_calibration"
+calibration_storage_path: "dekonbot_calibration/3d_pitag_calibration"
